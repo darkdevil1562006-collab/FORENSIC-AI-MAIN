@@ -1,0 +1,12 @@
+uvicorn[standard]
+fastapi
+speechbrain
+librosa
+soundfile
+numpy
+torch
+torchaudio
+opencv-python
+easyocr
+pytesseract
+python-multipart

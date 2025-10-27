@@ -1,0 +1,61 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install Python Deps",
+      "type": "shell",
+      "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "pip", "install", "-r", "server\\requirements.txt"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Start Backend",
+      "type": "shell",
+      "command": "${workspaceFolder}\\start-backend.bat",
+      "isBackground": true,
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Frontend",
+      "type": "shell",
+      "command": "${workspaceFolder}\\start-frontend.bat",
+      "isBackground": true,
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Typecheck (tsc)",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "--max-old-space-size=4096",
+        "./node_modules/.bin/tsc",
+        "--noEmit"
+      ],
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Run Dev (Backend + Frontend)",
+      "type": "shell",
+      "dependsOn": ["Start Backend", "Start Frontend"],
+      "problemMatcher": []
+    }
+  ]
+}

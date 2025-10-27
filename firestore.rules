@@ -1,0 +1,98 @@
+/**
+ * @file Firestore Security Rules
+ * @description This ruleset enforces a strict user-ownership model for suspect profiles and incident reports,
+ *              allowing users to manage their own data. It also provides open read access to case data for
+ *              authenticated users to populate dashboards. Additionally, it supports admin roles based on
+ *              the existence of a UID in the `/roles_admin/{uid}` collection.
+ *
+ * Data Structure:
+ * - /users/{userId}/suspectProfiles/{suspectProfileId}: Suspect profiles owned by individual users.
+ * - /users/{userId}/incidentReports/{incidentReportId}: Incident reports owned by individual users.
+ * - /roles_admin/{uid}: Documents representing admin users.
+ * - /cases/{caseId}: Case data accessible to all authenticated users.
+ *
+ * Key Security Decisions:
+ * - User-owned data (suspect profiles, incident reports) is strictly controlled by the user ID in the path.
+ * - Listing of suspect profiles and incident reports is allowed only for the owner.
+ * - Case data is publicly readable by any authenticated user, enabling dashboard functionality.
+ * - Admin roles are determined by presence in the `/roles_admin/{uid}` collection.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return get(/databases/$(database)/documents/roles_admin/$(request.auth.uid)).data.exists;
+    }
+
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Enforces user-ownership for suspect profiles, allowing users to manage their own profiles.
+     * @path /users/{userId}/suspectProfiles/{suspectProfileId}
+     * @allow (create) User A creates a suspect profile under their own user ID.
+     * @deny (create) User A attempts to create a suspect profile under User B's user ID.
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId}/suspectProfiles/{suspectProfileId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == suspectProfileId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Enforces user-ownership for incident reports, allowing users to manage their own reports.
+     * @path /users/{userId}/incidentReports/{incidentReportId}
+     * @allow (create) User A creates an incident report under their own user ID.
+     * @deny (create) User A attempts to create an incident report under User B's user ID.
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId}/incidentReports/{incidentReportId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == incidentReportId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+     /**
+      * @description Allows any authenticated user to read case data for dashboard statistics.
+      * @path /cases/{caseId}
+      * @allow (get) Any authenticated user can read a case document.
+      * @allow (list) Any authenticated user can list case documents.
+      * @deny (create) Non-admin users cannot create cases.
+      * @principle Allows public read access for authenticated users.
+      */
+    match /cases/{caseId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null;
+      allow delete: if isAdmin() && resource != null;
+    }
+    
+    /**
+     * @description Allows admins to manage the roles_admin collection.
+     * @path /roles_admin/{uid}
+     */
+    match /roles_admin/{uid} {
+        allow get: if isAdmin();
+        allow list: if isAdmin();
+        allow create: if isAdmin();
+        allow update: if false;
+        allow delete: if isAdmin();
+    }
+  }
+}

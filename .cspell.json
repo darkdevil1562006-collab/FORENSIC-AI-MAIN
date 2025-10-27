@@ -1,0 +1,17 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "nextin",
+    "neon",
+    "nest",
+    "neth",
+    "NEXT",
+    "dcbx",
+    "ctx",
+    "cdt",
+    "sctx",
+    "ddcx"
+  ],
+  "ignorePaths": ["node_modules", ".next", ".venv", "dist", "build"]
+}

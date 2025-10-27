@@ -1,0 +1,34 @@
+{
+  "placeholderImages": [
+    {
+      "id": "fingerprint-scan",
+      "description": "A high-resolution fingerprint scan.",
+      "imageUrl": "https://picsum.photos/seed/fp1/400/400",
+      "imageHint": "fingerprint scan"
+    },
+    {
+      "id": "database-fingerprint",
+      "description": "A fingerprint from a database.",
+      "imageUrl": "https://picsum.photos/seed/fp2/200/200",
+      "imageHint": "fingerprint"
+    },
+    {
+      "id": "suspect-face-1",
+      "description": "A mugshot of a suspect.",
+      "imageUrl": "https://picsum.photos/seed/face1/400/400",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "suspect-face-2",
+      "description": "A different mugshot of a suspect.",
+      "imageUrl": "https://picsum.photos/seed/face2/400/400",
+      "imageHint": "face mugshot"
+    },
+    {
+      "id": "soundwave",
+      "description": "A visualization of a soundwave.",
+      "imageUrl": "https://picsum.photos/seed/wave1/800/200",
+      "imageHint": "soundwave abstract"
+    }
+  ]
+}
